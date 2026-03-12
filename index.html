@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MS Helse</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+  --bg: #0E0E0E;
+  --surface: #161616;
+  --surface2: #1F1F1F;
+  --border: #2A2A2A;
+  --border2: #3A3A3A;
+  --text: #F0F0F0;
+  --muted: #888888;
+  --muted2: #484848;
+  --accent: #FFFFFF;
+  --accent-dim: rgba(255,255,255,0.07);
+  --green: #3D7A52;
+  --green-dim: rgba(61,122,82,0.15);
+  --danger: #C0392B;
+  --danger-dim: rgba(192,57,43,0.12);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; justify-content: center; }
+.app { width: 100%; max-width: 480px; display: flex; flex-direction: column; min-height: 100vh; }
+
+.header { padding: 18px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; position: sticky; top: 0; background: var(--bg); z-index: 10; }
+.logo-icon { width: 28px; height: 28px; background: var(--accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.logo-text { font-family: 'Fraunces', serif; font-size: 0.9rem; font-weight: 400; }
+.logo-text span { color: var(--muted); font-weight: 300; }
+.prog-wrap { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.prog-bar { width: 72px; height: 1px; background: var(--border2); }
+.prog-fill { height: 100%; background: var(--accent); transition: width 0.6s ease; }
+.prog-pct { font-size: 0.66rem; color: var(--muted); min-width: 28px; text-align: right; }
+
+/* SPLASH */
+.splash { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 40px 24px 60px; }
+.splash-title { font-family: 'Fraunces', serif; font-size: 1.95rem; font-weight: 300; line-height: 1.2; margin-bottom: 14px; }
+.splash-title em { font-style: italic; }
+.splash-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.75; font-weight: 300; margin-bottom: 36px; }
+.disclaimer { border-top: 1px solid var(--border); padding-top: 18px; margin-top: 20px; }
+.disclaimer p { font-size: 0.74rem; color: var(--muted2); line-height: 1.7; }
+.disclaimer strong { color: var(--muted); font-weight: 400; }
+
+/* PROFIL */
+.profile-wrap { flex: 1; overflow-y: auto; padding: 24px 20px 40px; display: flex; flex-direction: column; gap: 24px; }
+.profile-title { font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 300; line-height: 1.3; }
+.profile-subtitle { font-size: 0.8rem; color: var(--muted); line-height: 1.6; font-weight: 300; }
+.profile-section { display: flex; flex-direction: column; gap: 8px; }
+.profile-label { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; }
+.profile-options { display: flex; flex-wrap: wrap; gap: 6px; }
+.profile-btn { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 9px 14px; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; color: var(--text); font-weight: 300; cursor: pointer; transition: all 0.15s; }
+.profile-btn:hover { border-color: var(--border2); background: rgba(255,255,255,0.06); }
+.profile-btn.selected { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
+.profile-conditions { display: flex; flex-direction: column; gap: 5px; }
+.condition-btn { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; color: var(--text); font-weight: 300; cursor: pointer; transition: all 0.15s; text-align: left; display: flex; align-items: center; gap: 10px; }
+.condition-btn:hover { border-color: var(--border2); }
+.condition-btn.selected { border-color: var(--accent); background: var(--accent-dim); }
+.condition-check { width: 16px; height: 16px; border: 1px solid var(--border2); border-radius: 4px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.condition-btn.selected .condition-check { background: var(--accent); border-color: var(--accent); }
+.condition-check-inner { width: 8px; height: 8px; background: #0E0E0E; border-radius: 1px; opacity: 0; transition: opacity 0.15s; }
+.condition-btn.selected .condition-check-inner { opacity: 1; }
+
+.profile-textarea { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; font-family: 'DM Sans', sans-serif; font-size: 0.84rem; color: var(--text); font-weight: 300; width: 100%; resize: none; min-height: 80px; outline: none; transition: border-color 0.15s; }
+.profile-textarea:focus { border-color: var(--border2); }
+.profile-textarea::placeholder { color: var(--muted2); }
+
+/* INTRO QUESTION */
+.intro-wrap { flex: 1; overflow-y: auto; padding: 24px 20px 40px; display: flex; flex-direction: column; gap: 16px; }
+.intro-question { background: var(--surface); border: 1px solid var(--border); border-radius: 4px 14px 14px 14px; padding: 16px 18px; font-size: 0.9rem; line-height: 1.7; font-weight: 300; }
+.intro-textarea { background: var(--surface2); border: 1px solid var(--border2); border-radius: 10px; padding: 14px 16px; font-family: 'DM Sans', sans-serif; font-size: 0.84rem; color: var(--text); font-weight: 300; width: 100%; resize: none; min-height: 120px; outline: none; transition: border-color 0.15s; }
+.intro-textarea:focus { border-color: var(--accent); }
+.intro-textarea::placeholder { color: var(--muted2); }
+.intro-hint { font-size: 0.74rem; color: var(--muted2); line-height: 1.6; }
+
+/* CHAT */
+.chat-area { flex: 1; overflow-y: auto; padding: 24px 20px 20px; display: flex; flex-direction: column; gap: 18px; }
+.ai-msg { display: flex; flex-direction: column; gap: 8px; animation: fadeUp 0.3s ease both; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+.ai-bubble { background: var(--surface); border: 1px solid var(--border); border-radius: 4px 14px 14px 14px; padding: 14px 16px; font-size: 0.87rem; line-height: 1.7; color: var(--text); font-weight: 300; max-width: 90%; }
+.ai-sublabel { font-size: 0.74rem; color: var(--muted); margin-top: 5px; display: block; }
+.options-row { display: flex; flex-direction: column; gap: 5px; animation: fadeUp 0.3s ease 0.12s both; }
+.opt-btn { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 15px; text-align: left; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.84rem; color: var(--text); font-weight: 300; transition: all 0.15s; display: flex; align-items: center; gap: 10px; width: 100%; }
+.opt-btn:hover { border-color: var(--border2); background: rgba(255,255,255,0.06); }
+.opt-btn.selected { border-color: var(--accent); background: var(--accent-dim); }
+.opt-btn:disabled { opacity: 0.35; cursor: default; }
+.opt-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--muted2); flex-shrink: 0; transition: background 0.15s; }
+.opt-btn:hover .opt-dot, .opt-btn.selected .opt-dot { background: var(--accent); }
+
+.free-input-wrap { display: flex; flex-direction: column; gap: 6px; animation: fadeUp 0.2s ease both; }
+.free-input { background: var(--surface2); border: 1px solid var(--accent); border-radius: 10px; padding: 12px 14px; font-family: 'DM Sans', sans-serif; font-size: 0.84rem; color: var(--text); font-weight: 300; width: 100%; resize: none; min-height: 80px; outline: none; }
+.free-input::placeholder { color: var(--muted2); }
+.free-submit { background: var(--accent); color: #0E0E0E; border: none; border-radius: 8px; padding: 10px 16px; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 500; cursor: pointer; align-self: flex-end; transition: background 0.15s; }
+.free-submit:hover { background: #E0E0E0; }
+
+.user-msg { align-self: flex-end; background: var(--surface2); border: 1px solid var(--border2); border-radius: 14px 4px 14px 14px; padding: 11px 15px; font-size: 0.84rem; color: var(--text); font-weight: 400; max-width: 76%; animation: fadeUp 0.2s ease both; }
+.thinking { display: flex; align-items: center; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 4px 14px 14px 14px; max-width: 80px; }
+.thinking-dots { display: flex; gap: 4px; }
+.thinking-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--muted); animation: pulse 1.2s infinite; }
+.thinking-dot:nth-child(2) { animation-delay: 0.2s; }
+.thinking-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes pulse { 0%,80%,100% { opacity:0.2; transform:scale(0.8); } 40% { opacity:1; transform:scale(1); } }
+
+/* RESULT */
+.result-wrap { padding: 20px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
+.result-card { background: var(--surface); border: 1px solid var(--border2); border-radius: 14px; padding: 22px; position: relative; overflow: hidden; }
+.result-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, var(--accent), transparent); }
+.result-eyebrow { font-size: 0.64rem; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 500; margin-bottom: 10px; }
+.result-title { font-family: 'Fraunces', serif; font-size: 1.45rem; font-weight: 300; line-height: 1.25; margin-bottom: 14px; }
+.conf-row { display: flex; align-items: center; gap: 10px; }
+.conf-bar { flex: 1; height: 1px; background: var(--border2); }
+.conf-fill { height: 100%; background: var(--accent); transition: width 1.2s ease; }
+.conf-label { font-size: 0.68rem; color: var(--muted); white-space: nowrap; }
+.section-label { font-size: 0.64rem; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 500; display: flex; align-items: center; gap: 10px; }
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.findings-wrap { display: flex; flex-direction: column; }
+.finding { border-left: 1px solid var(--border2); padding: 0 0 22px 18px; position: relative; }
+.finding:last-child { padding-bottom: 0; border-left-color: transparent; }
+.finding::before { content: ''; position: absolute; left: -4px; top: 5px; width: 7px; height: 7px; border-radius: 50%; background: var(--muted2); border: 1px solid var(--muted2); }
+.finding.key::before { background: var(--accent); border-color: var(--accent); }
+.finding.warn::before { background: var(--danger); border-color: var(--danger); }
+.finding.confirm::before { background: var(--green); border-color: var(--green); }
+.finding-tag { font-size: 0.63rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 5px; display: block; color: var(--muted); }
+.finding.warn .finding-tag { color: var(--danger); }
+.finding.confirm .finding-tag { color: var(--green); }
+.finding-title { font-size: 0.86rem; font-weight: 500; margin-bottom: 6px; }
+.finding-body { font-size: 0.8rem; color: var(--muted); line-height: 1.7; font-weight: 300; }
+.finding-body strong { color: var(--text); font-weight: 500; }
+.info-box { background: var(--surface); border: 1px solid var(--border2); border-radius: 12px; padding: 18px; }
+.info-box.green { border-color: rgba(61,122,82,0.4); background: var(--green-dim); }
+.info-box.danger { border-color: rgba(192,57,43,0.4); background: var(--danger-dim); }
+.info-box-label { font-size: 0.63rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; margin-bottom: 8px; }
+.info-box.green .info-box-label { color: var(--green); }
+.info-box.danger .info-box-label { color: var(--danger); }
+.info-box-text { font-size: 0.83rem; color: var(--text); line-height: 1.75; font-weight: 300; }
+.info-box-text strong { font-weight: 500; }
+.flags-wrap { display: flex; flex-direction: column; gap: 4px; }
+.flag-item { font-size: 0.8rem; line-height: 1.6; font-weight: 300; display: flex; align-items: center; gap: 8px; }
+.flag-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.flag-dot.clear { background: var(--green); }
+.flag-dot.red { background: var(--danger); }
+.prog-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; display: flex; gap: 14px; align-items: flex-start; }
+.prog-card.active { border-color: var(--border2); }
+.prog-num { width: 30px; height: 30px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-size: 0.9rem; flex-shrink: 0; border: 1px solid var(--border2); color: var(--muted); }
+.prog-card.active .prog-num { border-color: var(--accent); color: var(--accent); }
+.prog-title { font-size: 0.85rem; font-weight: 500; margin-bottom: 4px; }
+.prog-desc { font-size: 0.75rem; color: var(--muted); line-height: 1.55; font-weight: 300; }
+.active-badge { display: inline-block; margin-top: 7px; font-size: 0.63rem; border: 1px solid var(--border2); color: var(--muted); padding: 3px 9px; border-radius: 4px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; }
+.ex-list { display: flex; flex-direction: column; gap: 1px; }
+.ex { background: var(--surface2); padding: 12px 15px; display: flex; align-items: flex-start; gap: 12px; }
+.ex:first-child { border-radius: 8px 8px 0 0; }
+.ex:last-child { border-radius: 0 0 8px 8px; }
+.ex:only-child { border-radius: 8px; }
+.ex-num { width: 22px; height: 22px; border: 1px solid var(--border2); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.67rem; color: var(--muted); flex-shrink: 0; margin-top: 2px; }
+.ex-name { font-size: 0.82rem; font-weight: 500; }
+.ex-detail { font-size: 0.7rem; color: var(--muted); margin-top: 2px; font-weight: 300; line-height: 1.5; }
+.divider { height: 1px; background: var(--border); }
+.btn { display: flex; align-items: center; justify-content: center; padding: 14px; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 500; cursor: pointer; border: none; transition: all 0.18s; width: 100%; }
+.btn-primary { background: var(--accent); color: #0E0E0E; }
+.btn-primary:hover { background: #E0E0E0; }
+.btn-ghost { background: none; color: var(--muted); font-size: 0.8rem; }
+.btn-ghost:hover { color: var(--accent); }
+.error-box { background: var(--danger-dim); border: 1px solid rgba(192,57,43,0.25); border-radius: 10px; padding: 14px 16px; font-size: 0.82rem; color: #e08070; line-height: 1.6; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header" id="header" style="display:none">
+    <div class="logo-icon">
+      <svg width="15" height="15" viewBox="0 0 20 20" fill="none">
+        <path d="M10 2C10 2 3 5 3 10C3 14 5.5 17 10 18.5C14.5 17 17 14 17 10C17 5 10 2 10 2Z" stroke="#0E0E0E" stroke-width="1.5" fill="none"/>
+        <path d="M10 6.5V13.5M7 10H13" stroke="#0E0E0E" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="logo-text">MS Helse <span>/ Muskelspesialist</span></div>
+    <div class="prog-wrap">
+      <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+      <div class="prog-pct" id="prog-pct">0%</div>
+    </div>
+  </div>
+
+  <!-- SPLASH -->
+  <div class="splash" id="splash">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:48px">
+      <div class="logo-icon" style="width:38px;height:38px">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M10 2C10 2 3 5 3 10C3 14 5.5 17 10 18.5C14.5 17 17 14 17 10C17 5 10 2 10 2Z" stroke="#0E0E0E" stroke-width="1.5" fill="none"/>
+          <path d="M10 6.5V13.5M7 10H13" stroke="#0E0E0E" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="logo-text" style="font-size:1.1rem">MS Helse <span>/ Muskelspesialist</span></div>
+    </div>
+    <div class="splash-title">Vi finner <em>årsaken</em>,<br>ikke bare symptomet.</div>
+    <div class="splash-desc">Basert på 8 års klinisk erfaring fra Muskelspesialist Klinikken. Vi stiller deg de samme spørsmålene terapeuten din ville stilt – og lager et program tilpasset akkurat deg.</div>
+    <button class="btn btn-primary" onclick="showProfile()">Kom i gang</button>
+    <div class="disclaimer">
+      <p><strong>Viktig:</strong> Denne appen gir veiledning – ikke diagnoser. Den erstatter ikke helsepersonell. Ved alvorlige symptomer skal du alltid oppsøke lege.</p>
+    </div>
+  </div>
+
+  <!-- PROFIL -->
+  <div class="profile-wrap" id="profile" style="display:none">
+    <div>
+      <div class="profile-title">Litt om deg først</div>
+      <div class="profile-subtitle" style="margin-top:6px">Dette hjelper oss gi deg en mer presis vurdering. Tar under ett minutt.</div>
+    </div>
+
+    <div class="profile-section">
+      <div class="profile-label">Kjønn</div>
+      <div class="profile-options" id="gender-opts">
+        <button class="profile-btn" onclick="selectOne('gender-opts', this)" data-val="Mann">Mann</button>
+        <button class="profile-btn" onclick="selectOne('gender-opts', this)" data-val="Kvinne">Kvinne</button>
+        <button class="profile-btn" onclick="selectOne('gender-opts', this)" data-val="Ønsker ikke å oppgi">Ønsker ikke å oppgi</button>
+      </div>
+    </div>
+
+    <div class="profile-section">
+      <div class="profile-label">Alder</div>
+      <div class="profile-options" id="age-opts">
+        <button class="profile-btn" onclick="selectOne('age-opts', this)" data-val="Under 20">Under 20</button>
+        <button class="profile-btn" onclick="selectOne('age-opts', this)" data-val="20–30">20–30</button>
+        <button class="profile-btn" onclick="selectOne('age-opts', this)" data-val="31–40">31–40</button>
+        <button class="profile-btn" onclick="selectOne('age-opts', this)" data-val="41–50">41–50</button>
+        <button class="profile-btn" onclick="selectOne('age-opts', this)" data-val="51–60">51–60</button>
+        <button class="profile-btn" onclick="selectOne('age-opts', this)" data-val="Over 60">Over 60</button>
+      </div>
+    </div>
+
+    <div class="profile-section">
+      <div class="profile-label">Kjente tilstander (velg alle som gjelder)</div>
+      <div class="profile-conditions" id="conditions">
+        <button class="condition-btn" onclick="toggleCondition(this)" data-val="Benskjørhet / osteoporose"><div class="condition-check"><div class="condition-check-inner"></div></div>Benskjørhet / osteoporose</button>
+        <button class="condition-btn" onclick="toggleCondition(this)" data-val="Hypermobilitet"><div class="condition-check"><div class="condition-check-inner"></div></div>Hypermobilitet</button>
+        <button class="condition-btn" onclick="toggleCondition(this)" data-val="Revmatisme"><div class="condition-check"><div class="condition-check-inner"></div></div>Revmatisme</button>
+        <button class="condition-btn" onclick="toggleCondition(this)" data-val="Leddgikt"><div class="condition-check"><div class="condition-check-inner"></div></div>Leddgikt</button>
+        <button class="condition-btn" onclick="toggleCondition(this)" data-val="Fibromyalgi"><div class="condition-check"><div class="condition-check-inner"></div></div>Fibromyalgi</button>
+        <button class="condition-btn" onclick="toggleCondition(this)" data-val="Diabetes"><div class="condition-check"><div class="condition-check-inner"></div></div>Diabetes</button>
+        <button class="condition-btn" onclick="toggleCondition(this)" data-val="Gravid"><div class="condition-check"><div class="condition-check-inner"></div></div>Gravid</button>
+        <button class="condition-btn" onclick="toggleCondition(this)" data-val="Nylig operert"><div class="condition-check"><div class="condition-check-inner"></div></div>Nylig operert</button>
+        <button class="condition-btn" onclick="toggleCondition(this)" data-val="Ingen kjente tilstander"><div class="condition-check"><div class="condition-check-inner"></div></div>Ingen kjente tilstander</button>
+      </div>
+    </div>
+
+    <div class="profile-section">
+      <div class="profile-label">Tidligere skader eller operasjoner (valgfritt)</div>
+      <textarea class="profile-textarea" id="injury-history" placeholder="F.eks. prolaps 2019, meniskoperasjon høyre kne, brudd i håndledd..."></textarea>
+    </div>
+
+    <div class="profile-section">
+      <div class="profile-label">Generelt aktivitetsnivå</div>
+      <div class="profile-options" id="activity-opts">
+        <button class="profile-btn" onclick="selectOne('activity-opts', this)" data-val="Lite aktiv (stillesittende hverdag)">Lite aktiv</button>
+        <button class="profile-btn" onclick="selectOne('activity-opts', this)" data-val="Moderat aktiv (trener 1–2 ganger/uke)">Moderat aktiv</button>
+        <button class="profile-btn" onclick="selectOne('activity-opts', this)" data-val="Aktiv (trener 3–4 ganger/uke)">Aktiv</button>
+        <button class="profile-btn" onclick="selectOne('activity-opts', this)" data-val="Veldig aktiv (trener 5+ ganger/uke)">Veldig aktiv</button>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="showIntro()" style="margin-top:8px">Fortsett</button>
+  </div>
+
+  <!-- INTRO SPØRSMÅL -->
+  <div class="intro-wrap" id="intro" style="display:none">
+    <div class="intro-question">Beskriv plagen din med dine egne ord. Hva plager deg, og hva ønsker du hjelp med?</div>
+    <textarea class="intro-textarea" id="intro-text" placeholder="F.eks: Jeg har hatt vondt i korsryggen i 3 uker. Det startet etter at jeg løftet noe tungt på jobb. Det verker mest om morgenen og stråler litt ned i venstre lår..."></textarea>
+    <div class="intro-hint">Skriv så mye eller lite du vil. AI-en bruker dette som utgangspunkt for spørsmålene sine.</div>
+    <button class="btn btn-primary" onclick="startChat()">Start kartlegging</button>
+  </div>
+
+  <div class="chat-area" id="chat" style="display:none"></div>
+  <div class="result-wrap" id="result" style="display:none"></div>
+
+</div>
+
+<script>
+let profile = {};
+let messages = [];
+let busy = false;
+
+function selectOne(groupId, btn) {
+  document.querySelectorAll('#' + groupId + ' .profile-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function toggleCondition(btn) {
+  btn.classList.toggle('selected');
+}
+
+function showProfile() {
+  document.getElementById('splash').style.display = 'none';
+  document.getElementById('profile').style.display = 'flex';
+  document.getElementById('header').style.display = 'flex';
+  document.getElementById('prog-fill').style.width = '5%';
+  document.getElementById('prog-pct').textContent = '5%';
+}
+
+function showIntro() {
+  const gender = document.querySelector('#gender-opts .selected')?.dataset.val || 'Ikke oppgitt';
+  const age = document.querySelector('#age-opts .selected')?.dataset.val || 'Ikke oppgitt';
+  const activity = document.querySelector('#activity-opts .selected')?.dataset.val || 'Ikke oppgitt';
+  const conditions = [...document.querySelectorAll('#conditions .selected')].map(b => b.dataset.val);
+  const injuryHistory = document.getElementById('injury-history').value.trim();
+
+  profile = { gender, age, activity, conditions, injuryHistory };
+
+  document.getElementById('profile').style.display = 'none';
+  document.getElementById('intro').style.display = 'flex';
+  document.getElementById('prog-fill').style.width = '10%';
+  document.getElementById('prog-pct').textContent = '10%';
+}
+
+function startChat() {
+  const introText = document.getElementById('intro-text').value.trim();
+  if (!introText) { alert('Beskriv plagen din først.'); return; }
+
+  document.getElementById('intro').style.display = 'none';
+  document.getElementById('chat').style.display = 'flex';
+
+  const profileSummary = `
+BRUKERPROFIL:
+- Kjønn: ${profile.gender}
+- Alder: ${profile.age}
+- Aktivitetsnivå: ${profile.activity}
+- Kjente tilstander: ${profile.conditions.length ? profile.conditions.join(', ') : 'Ingen oppgitt'}
+- Tidligere skader/operasjoner: ${profile.injuryHistory || 'Ingen oppgitt'}
+
+BRUKERENS BESKRIVELSE AV PLAGEN:
+"${introText}"
+
+Bruk denne informasjonen aktivt. Still oppfølgingsspørsmål basert på dette – ikke spør om noe brukeren allerede har besvart. Ta hensyn til profilen i konklusjonen (f.eks. hypermobilitet, graviditet, alder og kjønn påvirker klinisk bilde).`;
+
+  messages.push({ role: 'user', content: profileSummary });
+  askAI();
+}
+
+async function askAI(userAnswer) {
+  if (busy) return;
+  busy = true;
+
+  const chat = document.getElementById('chat');
+
+  if (userAnswer !== undefined) {
+    const el = document.createElement('div');
+    el.className = 'user-msg';
+    el.textContent = userAnswer;
+    chat.appendChild(el);
+    messages.push({ role: 'user', content: userAnswer });
+  }
+
+  const thinkEl = document.createElement('div');
+  thinkEl.className = 'ai-msg thinking';
+  thinkEl.innerHTML = '<div class="thinking-dots"><div class="thinking-dot"></div><div class="thinking-dot"></div><div class="thinking-dot"></div></div>';
+  chat.appendChild(thinkEl);
+  chat.scrollTop = chat.scrollHeight;
+
+  try {
+    const res = await fetch('/.netlify/functions/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages })
+    });
+
+    const data = await res.json();
+    thinkEl.remove();
+
+    if (!res.ok || !data.content?.[0]?.text) {
+      showError(chat, JSON.stringify(data));
+      busy = false;
+      return;
+    }
+
+    const raw = data.content[0].text.trim();
+    messages.push({ role: 'assistant', content: raw });
+
+    let parsed;
+    try {
+      const jsonStart = raw.indexOf('{');
+      const jsonEnd = raw.lastIndexOf('}');
+      if (jsonStart === -1 || jsonEnd === -1) throw new Error('Ingen JSON funnet');
+      parsed = JSON.parse(raw.slice(jsonStart, jsonEnd + 1));
+    } catch {
+      showError(chat, 'Kunne ikke tolke svar fra AI');
+      busy = false;
+      return;
+    }
+
+    if (parsed.done && parsed.assessment) {
+      busy = false;
+      renderResult(parsed.assessment);
+      return;
+    }
+
+    const pct = parsed.progress || 15;
+    document.getElementById('prog-fill').style.width = pct + '%';
+    document.getElementById('prog-pct').textContent = pct + '%';
+
+    const msgEl = document.createElement('div');
+    msgEl.className = 'ai-msg';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'ai-bubble';
+    bubble.textContent = parsed.question;
+    if (parsed.sublabel) {
+      const sub = document.createElement('span');
+      sub.className = 'ai-sublabel';
+      sub.textContent = parsed.sublabel;
+      bubble.appendChild(sub);
+    }
+    msgEl.appendChild(bubble);
+
+    const isMulti = parsed.sublabel && /flere|multi/i.test(parsed.sublabel);
+    const optsEl = document.createElement('div');
+    optsEl.className = 'options-row';
+
+    const confirmBtn = document.createElement('button');
+    confirmBtn.className = 'free-submit';
+    confirmBtn.textContent = 'Bekreft';
+    confirmBtn.style.display = 'none';
+    confirmBtn.style.marginTop = '6px';
+
+    const lockAndSend = (answer) => {
+      optsEl.querySelectorAll('.opt-btn').forEach(b => { b.disabled = true; });
+      confirmBtn.style.display = 'none';
+      askAI(answer);
+    };
+
+    confirmBtn.onclick = () => {
+      if (optsEl.querySelector('.opt-btn.selected[data-val="Annet – beskriv selv"]')) {
+        showFreeInput(msgEl);
+        optsEl.querySelectorAll('.opt-btn').forEach(b => { b.disabled = true; });
+        confirmBtn.style.display = 'none';
+        return;
+      }
+      const selected = [...optsEl.querySelectorAll('.opt-btn.selected')].map(b => b.dataset.val);
+      if (!selected.length) return;
+      lockAndSend(selected.join(', '));
+    };
+
+    (parsed.options || []).forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'opt-btn';
+      btn.dataset.val = opt;
+      btn.innerHTML = `<div class="opt-dot"></div><span>${opt}</span>`;
+      btn.onclick = () => {
+        if (isMulti) {
+          if (opt === 'Annet – beskriv selv') {
+            optsEl.querySelectorAll('.opt-btn').forEach(b => { b.classList.remove('selected'); });
+            btn.classList.add('selected');
+          } else {
+            optsEl.querySelector('[data-val="Annet – beskriv selv"]')?.classList.remove('selected');
+            btn.classList.toggle('selected');
+          }
+        } else {
+          optsEl.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+        }
+        const anySelected = optsEl.querySelector('.opt-btn.selected');
+        confirmBtn.style.display = anySelected ? 'block' : 'none';
+      };
+      optsEl.appendChild(btn);
+    });
+
+    msgEl.appendChild(optsEl);
+    msgEl.appendChild(confirmBtn);
+    chat.appendChild(msgEl);
+
+    chat.scrollTop = chat.scrollHeight;
+
+  } catch(e) {
+    thinkEl.remove();
+    showError(chat, e.message);
+  }
+
+  busy = false;
+}
+
+function showFreeInput(msgEl) {
+  const wrap = document.createElement('div');
+  wrap.className = 'free-input-wrap';
+  const ta = document.createElement('textarea');
+  ta.className = 'free-input';
+  ta.placeholder = 'Beskriv med egne ord...';
+  ta.rows = 3;
+  const btn = document.createElement('button');
+  btn.className = 'free-submit';
+  btn.textContent = 'Send';
+  btn.onclick = () => {
+    const val = ta.value.trim();
+    if (!val) return;
+    btn.disabled = true;
+    ta.disabled = true;
+    askAI(val);
+  };
+  wrap.appendChild(ta);
+  wrap.appendChild(btn);
+  msgEl.appendChild(wrap);
+  ta.focus();
+  document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
+}
+
+function showError(chat, msg) {
+  const el = document.createElement('div');
+  el.className = 'error-box ai-msg';
+  el.textContent = 'Feil: ' + (msg || 'Ukjent feil');
+  chat.appendChild(el);
+}
+
+function renderResult(a) {
+  document.getElementById('chat').style.display = 'none';
+  document.getElementById('prog-fill').style.width = '100%';
+  document.getElementById('prog-pct').textContent = '100%';
+
+  const wrap = document.getElementById('result');
+  wrap.style.display = 'flex';
+
+  const findingsHTML = (a.findings || []).map(f => `
+    <div class="finding ${f.type || 'key'}">
+      <span class="finding-tag">${f.tag}</span>
+      <div class="finding-title">${f.title}</div>
+      <div class="finding-body">${f.body}</div>
+    </div>`).join('');
+
+  const exHTML = (a.exercises || []).map((e, i) => `
+    <div class="ex">
+      <div class="ex-num">${i+1}</div>
+      <div><div class="ex-name">${e.name}</div><div class="ex-detail">${e.detail}</div></div>
+    </div>`).join('');
+
+  const redFlags = (a.flags?.red || []);
+  const clearFlags = (a.flags?.clear || []);
+  const flagsHTML = [...redFlags.map(f => `<div class="flag-item"><div class="flag-dot red"></div>${f}</div>`),
+    ...clearFlags.map(f => `<div class="flag-item"><div class="flag-dot clear"></div>${f}</div>`)].join('');
+
+  wrap.innerHTML = `
+    <div class="result-card">
+      <div class="result-eyebrow">Vår vurdering</div>
+      <div class="result-title">${a.title}</div>
+      <div class="conf-row">
+        <div class="conf-bar"><div class="conf-fill" id="conf-fill" style="width:0%"></div></div>
+        <div class="conf-label">${a.confidence}% sikkerhet</div>
+      </div>
+      ${a.confidence_note ? `<div style="font-size:0.74rem;color:var(--muted);margin-top:10px;line-height:1.6;">${a.confidence_note}</div>` : ''}
+    </div>
+
+    ${flagsHTML ? `<div class="info-box ${redFlags.length ? 'danger' : 'green'}">
+      <div class="info-box-label">${redFlags.length ? 'Røde flagg' : 'Sikkerhetssjekk'}</div>
+      <div class="flags-wrap">${flagsHTML}</div>
+    </div>` : ''}
+
+    <div class="section-label">Slik tenkte vi</div>
+    <div class="findings-wrap">${findingsHTML}</div>
+
+    ${a.lifestyle ? `<div class="info-box">
+      <div class="info-box-label">${a.lifestyle.title}</div>
+      <div class="info-box-text">${a.lifestyle.body}</div>
+    </div>` : ''}
+
+    ${a.confirmatory ? `<div class="info-box green">
+      <div class="info-box-label">${a.confirmatory.title}</div>
+      <div class="info-box-text">${a.confirmatory.body}</div>
+    </div>` : ''}
+
+    <div class="info-box">
+      <div class="info-box-label">Konklusjon</div>
+      <div class="info-box-text">${a.summary}</div>
+    </div>
+
+    <div class="section-label" style="margin-top:4px">Din rehabiliteringsplan</div>
+
+    <div class="prog-card active">
+      <div class="prog-num">1</div>
+      <div>
+        <div class="prog-title">Bli skadefri</div>
+        <div class="prog-desc">${a.program_desc || ''}</div>
+        <span class="active-badge">Aktiv nå</span>
+      </div>
+    </div>
+
+    ${exHTML ? `<div class="ex-list">${exHTML}</div>` : ''}
+
+    <div class="divider"></div>
+
+    <div class="prog-card" style="opacity:0.4">
+      <div class="prog-num">2</div>
+      <div>
+        <div class="prog-title">Bygg grunnlaget</div>
+        <div class="prog-desc">Aktiver svake muskler, korriger bevegelsesmønstre og bygg stabilitet som holder over tid.</div>
+      </div>
+    </div>
+
+    <div class="prog-card" style="opacity:0.2">
+      <div class="prog-num">3</div>
+      <div>
+        <div class="prog-title">Bli sterkere enn noensinne</div>
+        <div class="prog-desc">Periodisert styrketrening, kosthold, søvn og vaner. Bedre enn for 10 år siden.</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <button class="btn btn-primary" onclick="alert('I fullversjonen starter du nå Akt 1 med video-veiledning og ukentlig progresjon.')">Start Akt 1</button>
+    <button class="btn btn-ghost" onclick="location.reload()">← Start på nytt</button>
+  `;
+
+  setTimeout(() => {
+    const cf = document.getElementById('conf-fill');
+    if (cf) cf.style.width = a.confidence + '%';
+  }, 400);
+
+  wrap.scrollTop = 0;
+  window.scrollTo({ top: 0 });
+}
+</script>
+</body>
+</html>
