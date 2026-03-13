@@ -375,6 +375,7 @@ async function askAI(userAnswer) {
     }
 
     const raw = data.content[0].text.trim();
+    console.log("RAW SVAR:", raw);
     messages.push({ role: 'assistant', content: raw });
 
     let parsed;
