@@ -195,7 +195,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
       </div>
       <div class="logo-text" style="font-size:1.1rem">MS Helse <span>/ Muskelspesialist</span></div>
     </div>
-    <div class="splash-title">Vi finner <em>årsaken</em>,<br>ikke bare symptomet.</div>
+    <div class="splash-title">Smertefri er bare<br><em>begynnelsen.</em></div>
     <div class="splash-desc">Basert på 8 års klinisk erfaring fra Muskelspesialist Klinikken. Vi stiller deg de samme spørsmålene terapeuten din ville stilt – og lager et program tilpasset akkurat deg.</div>
     <button class="btn btn-primary" onclick="showProfile()">Kom i gang</button>
     <div class="disclaimer">
@@ -234,15 +234,20 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
     <div class="profile-section">
       <div class="profile-label">Kjente tilstander (velg alle som gjelder)</div>
       <div class="profile-conditions" id="conditions">
+        <button class="condition-btn" onclick="toggleCondition(this)" data-val="Artrose"><div class="condition-check"><div class="condition-check-inner"></div></div>Artrose</button>
+        <button class="condition-btn" onclick="toggleCondition(this)" data-val="Bekhterevs sykdom"><div class="condition-check"><div class="condition-check-inner"></div></div>Bekhterevs sykdom</button>
         <button class="condition-btn" onclick="toggleCondition(this)" data-val="Benskjørhet / osteoporose"><div class="condition-check"><div class="condition-check-inner"></div></div>Benskjørhet / osteoporose</button>
-        <button class="condition-btn" onclick="toggleCondition(this)" data-val="Hypermobilitet"><div class="condition-check"><div class="condition-check-inner"></div></div>Hypermobilitet</button>
-        <button class="condition-btn" onclick="toggleCondition(this)" data-val="Revmatisme"><div class="condition-check"><div class="condition-check-inner"></div></div>Revmatisme</button>
-        <button class="condition-btn" onclick="toggleCondition(this)" data-val="Leddgikt"><div class="condition-check"><div class="condition-check-inner"></div></div>Leddgikt</button>
         <button class="condition-btn" onclick="toggleCondition(this)" data-val="Fibromyalgi"><div class="condition-check"><div class="condition-check-inner"></div></div>Fibromyalgi</button>
-        <button class="condition-btn" onclick="toggleCondition(this)" data-val="Diabetes"><div class="condition-check"><div class="condition-check-inner"></div></div>Diabetes</button>
         <button class="condition-btn" onclick="toggleCondition(this)" data-val="Gravid"><div class="condition-check"><div class="condition-check-inner"></div></div>Gravid</button>
+        <button class="condition-btn" onclick="toggleCondition(this)" data-val="Hypermobilitet"><div class="condition-check"><div class="condition-check-inner"></div></div>Hypermobilitet</button>
+        <button class="condition-btn" onclick="toggleCondition(this)" data-val="Migrene"><div class="condition-check"><div class="condition-check-inner"></div></div>Migrene</button>
         <button class="condition-btn" onclick="toggleCondition(this)" data-val="Nylig operert"><div class="condition-check"><div class="condition-check-inner"></div></div>Nylig operert</button>
+        <button class="condition-btn" onclick="toggleCondition(this)" data-val="Revmatisme / leddgikt"><div class="condition-check"><div class="condition-check-inner"></div></div>Revmatisme / leddgikt</button>
+        <button class="condition-btn" onclick="toggleCondition(this)" data-val="Skoliose"><div class="condition-check"><div class="condition-check-inner"></div></div>Skoliose</button>
+        <button class="condition-btn" onclick="toggleCondition(this)" data-val="Tidligere prolaps"><div class="condition-check"><div class="condition-check-inner"></div></div>Tidligere prolaps</button>
+        <button class="condition-btn" onclick="toggleCondition(this)" data-val="Tidligere whiplash"><div class="condition-check"><div class="condition-check-inner"></div></div>Tidligere whiplash</button>
         <button class="condition-btn" onclick="toggleCondition(this)" data-val="Ingen kjente tilstander"><div class="condition-check"><div class="condition-check-inner"></div></div>Ingen kjente tilstander</button>
+        <textarea class="profile-textarea" id="other-conditions" placeholder="Andre tilstander / diagnoser du mener er relevant" style="margin-top:6px"></textarea>
       </div>
     </div>
 
@@ -304,9 +309,10 @@ function showIntro() {
   const age = document.querySelector('#age-opts .selected')?.dataset.val || 'Ikke oppgitt';
   const activity = document.querySelector('#activity-opts .selected')?.dataset.val || 'Ikke oppgitt';
   const conditions = [...document.querySelectorAll('#conditions .selected')].map(b => b.dataset.val);
+  const otherConditions = document.getElementById('other-conditions').value.trim();
   const injuryHistory = document.getElementById('injury-history').value.trim();
 
-  profile = { gender, age, activity, conditions, injuryHistory };
+  profile = { gender, age, activity, conditions, otherConditions, injuryHistory };
 
   document.getElementById('profile').style.display = 'none';
   document.getElementById('intro').style.display = 'flex';
@@ -326,7 +332,7 @@ BRUKERPROFIL:
 - Kjønn: ${profile.gender}
 - Alder: ${profile.age}
 - Aktivitetsnivå: ${profile.activity}
-- Kjente tilstander: ${profile.conditions.length ? profile.conditions.join(', ') : 'Ingen oppgitt'}
+- Kjente tilstander: ${profile.conditions.length ? profile.conditions.join(', ') : 'Ingen oppgitt'}${profile.otherConditions ? '\n- Andre tilstander (fritekst): ' + profile.otherConditions : ''}
 - Tidligere skader/operasjoner: ${profile.injuryHistory || 'Ingen oppgitt'}
 
 BRUKERENS BESKRIVELSE AV PLAGEN:
