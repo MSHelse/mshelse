@@ -1,9 +1,2 @@
 [build]
   functions = "netlify/functions"
-
-[functions]
-  node_bundler = "esbuild"
-  timeout = 26
-
-[functions."chat"]
-  timeout = 26
