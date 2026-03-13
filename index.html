@@ -359,7 +359,7 @@ async function askAI(userAnswer) {
   chat.scrollTop = chat.scrollHeight;
 
   try {
-    const res = await fetch('/.netlify/functions/chat', {
+    const res = await fetch('https://mshelse-server.onrender.com/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ messages })
